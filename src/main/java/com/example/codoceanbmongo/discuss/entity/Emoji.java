@@ -3,20 +3,29 @@ package com.example.codoceanbmongo.discuss.entity;
 import com.example.codoceanbmongo.auth.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
+@Document(collection = "emojis")
 @Setter
 @Getter
-@Table(name = "emojis")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@IdClass(EmojiId.class)
 public class Emoji {
     @Id
-    @ManyToOne
+    private String id;
+
+    @DBRef
     private User owner;
-    @Id
-    @ManyToOne
+
+    @DBRef
     private Discuss discuss;
+
+    @Transient
+    public void generateId() {
+        if (owner != null && discuss != null) {
+            this.id = new EmojiId(owner.getId(), discuss.getId()).toString();
+        }
+    }
 }

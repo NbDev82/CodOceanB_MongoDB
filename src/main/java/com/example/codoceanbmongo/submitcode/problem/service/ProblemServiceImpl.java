@@ -70,7 +70,10 @@ public class ProblemServiceImpl implements ProblemService{
 
     @Override
     public List<Problem> getAll() {
-        return problemRepository.getAll();
+        return problemRepository.findAll()
+                .stream()
+                .filter(p -> !p.isDeleted())
+                .toList();
     }
 
     @Override

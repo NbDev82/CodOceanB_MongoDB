@@ -3,11 +3,12 @@ package com.example.codoceanbmongo.payment.entity;
 import com.example.codoceanbmongo.auth.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "payments")
+@Document(collection = "payments")
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter
@@ -24,7 +25,6 @@ public class Payment {
     private String currency;
     private String description;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @DBRef
     private User user;
 }

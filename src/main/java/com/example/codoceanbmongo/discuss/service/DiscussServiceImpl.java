@@ -17,10 +17,7 @@ import com.example.codoceanbmongo.uploadfile.service.UploadFileService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -52,7 +49,7 @@ public class DiscussServiceImpl implements DiscussService{
         try {
             User user = userService.getUserDetailsFromToken(token);
             String email = user.getEmail();
-            List<Discuss> discusses = discussRepository.findByOwnerEmail(email);
+            List<Discuss> discusses = discussRepository.findByIsClosedFalseAndOwnerEmail(email);
             return discusses.stream()
                     .map(discuss -> discuss.toDTO(user.getId()))
                     .collect(Collectors.toList());
@@ -75,7 +72,8 @@ public class DiscussServiceImpl implements DiscussService{
             UUID userId = userService.getUserDetailsFromToken(authHeader).getId();
 
             Pageable pagination = PageRequest.of(pageNumber, limit, Sort.by(Sort.Direction.DESC, "comment_count"));
-            Page<Discuss> discussPage = discussRepository.findAllWithCommentCount(searchTerm, category, pagination);
+            int skip = pagination.getPageNumber() * pagination.getPageSize();
+            Slice<Discuss> discussPage = discussRepository.findAllWithCommentCount(searchTerm, category, skip, limit);
             return discussPage.stream()
                     .map(discuss -> discuss.toDTO(userId))
                     .collect(Collectors.toList());
@@ -91,7 +89,7 @@ public class DiscussServiceImpl implements DiscussService{
             User owner = userService.getUserDetailsFromToken(authHeader);
             List<Category> categories = null;
             if (request.getCategories() != null) {
-                categories = categoryRepository.findAllByNames(request.getCategories().stream().map(CategoryDTO::getName).collect(Collectors.toList()));
+                categories = categoryRepository.findByNameIn(request.getCategories().stream().map(CategoryDTO::getName).collect(Collectors.toList()));
             }
             List<Image> images = new ArrayList<>();
 
@@ -132,7 +130,7 @@ public class DiscussServiceImpl implements DiscussService{
 
             List<Category> categories = null;
             if (request.getCategories() != null) {
-                categories = categoryRepository.findAllByNames(request.getCategories().stream().map(CategoryDTO::getName).collect(Collectors.toList()));
+                categories = categoryRepository.findByNameIn(request.getCategories().stream().map(CategoryDTO::getName).collect(Collectors.toList()));
             }
 
             if (request.getTitle() != null) {

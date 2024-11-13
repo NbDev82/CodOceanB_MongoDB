@@ -2,24 +2,23 @@ package com.example.codoceanbmongo.report.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.UUID;
 
-@Entity
-@Table(name = "violation_types")
+@Document(collection = "violation_types")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
 public class ViolationType {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     private String description;
 
-    @ManyToOne
-    @JoinColumn(name = "report_id")
+    @DBRef
     private Report report;
 
     @Getter

@@ -49,7 +49,7 @@ public class DiscussCommentServiceImpl implements DiscussCommentService{
 
     @Override
     public List<DiscussCommentDTO> getAllCommentsByDiscussId(UUID discussId) {
-        List<Comment> comments = commentRepository.findAllByDiscussId(discussId);
+        List<Comment> comments = commentRepository.findByDiscussIdOrderByCreatedAtAsc(discussId);
         return comments.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
@@ -105,7 +105,7 @@ public class DiscussCommentServiceImpl implements DiscussCommentService{
 
     @Override
     public List<DiscussCommentDTO> getReplies(UUID commentId) {
-        List<Comment> comments = commentRepository.findByCommentParentId(commentId);
+        List<Comment> comments = commentRepository.findByCommentParentIdOrderByCreatedAtAsc(commentId);
         return comments.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());

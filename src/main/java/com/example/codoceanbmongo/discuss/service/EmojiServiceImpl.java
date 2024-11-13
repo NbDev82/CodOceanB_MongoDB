@@ -32,7 +32,7 @@ public class EmojiServiceImpl implements EmojiService{
                 .discuss(discussId)
                 .build();
 
-        if(!emojiRepository.existsById(id)) {
+        if(!emojiRepository.existsById(id.toString())) {
             Emoji emoji = Emoji.builder()
                     .owner(owner)
                     .discuss(discuss)
@@ -49,6 +49,6 @@ public class EmojiServiceImpl implements EmojiService{
                 .discuss(discussId)
                 .build();
 
-        emojiRepository.deleteById(id);
+        emojiRepository.deleteById(id.toString());
     }
 }

@@ -25,7 +25,9 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService{
     public List<Map<String, Object>> fetchMonthlyPosts(int year) {
         List<Map<String, Object>> monthlyPosts = new ArrayList<>();
         try {
-            monthlyPosts = discussRepository.getMonthlyPostsCount(year);
+            String startOfYear = year + "-01-01T00:00:00Z";
+            String endOfYear = (year + 1) + "-01-01T00:00:00Z";
+            monthlyPosts = discussRepository.getMonthlyPostsCount(startOfYear, endOfYear);
             log.info("Fetched monthly posts for year {}: {}", year, monthlyPosts);
         } catch (Exception e) {
             log.error("Failed to fetch monthly posts for year {}: {}", year, e.getMessage());
@@ -37,7 +39,7 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService{
     public List<Map<String, Object>> fetchTotalUsersMonthly(int year) {
         List<Map<String, Object>> totalUsersMonthly = new ArrayList<>();
         try {
-            totalUsersMonthly = userRepos.getTotalMonthlyUsersCountByYear(year);
+//            totalUsersMonthly = userRepos.getTotalMonthlyUsersCountByYear(year);
             log.info("Fetched total users monthly for year {}: {}", year, totalUsersMonthly);
         } catch (Exception e) {
             log.error("Failed to fetch total users monthly for year {}: {}", year, e.getMessage());
@@ -49,7 +51,7 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService{
     public List<Map<String, Object>> fetchNewUsersMonthly(int year) {
         List<Map<String, Object>> newUsersMonthly = new ArrayList<>();
         try {
-            newUsersMonthly = userRepos.getMonthlyNewUsersCountByYear(year);
+//            newUsersMonthly = userRepos.getMonthlyNewUsersCountByYear(year);
             log.info("Fetched new users monthly for year {}: {}", year, newUsersMonthly);
         } catch (Exception e) {
             log.error("Failed to fetch new users monthly for year {}: {}", year, e.getMessage());

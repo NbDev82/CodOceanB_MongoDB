@@ -6,34 +6,30 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Entity
-@Table(name = "notifications")
+@Document(collection = "notifications")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
 public class Notification implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     private String content;
 
-    @Column(name = "receiving_time")
     private LocalDateTime receivingTime;
 
-    @Column(name = "is_read")
     private boolean isRead;
 
-    @Column(name = "is_delete")
     private boolean isDelete;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
+    @DBRef
     private User recipient;
 }

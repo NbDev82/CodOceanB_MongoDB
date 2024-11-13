@@ -9,47 +9,40 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Entity
-@Table(name = "comments")
+@Document(collection = "comments")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
 public class Comment implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     private String text;
 
-    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "is_deleted")
     private boolean isDeleted;
 
-    @ManyToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name = "comment_id", referencedColumnName = "id")
+    @DBRef
     private Comment commentParent;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @DBRef
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "discuss_id")
+    @DBRef
     private Discuss discuss;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "problem_id")
+    @DBRef
     private Problem problem;
 
     public CommentDTO toDTO() {

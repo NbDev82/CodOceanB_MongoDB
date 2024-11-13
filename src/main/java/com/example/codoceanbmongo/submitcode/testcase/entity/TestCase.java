@@ -7,32 +7,29 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
-@Entity
-@Table(name = "test_cases")
+@Document(collection = "test_cases")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
 public class TestCase implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Column(name = "output_data")
     private String outputData;
 
-    @Column(name = "is_public")
     private boolean isPublic = false;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "problem_id")
+    @DBRef
     private Problem problem;
 
-    @OneToMany(mappedBy = "testCase", cascade = CascadeType.ALL)
+    @DBRef
     private List<Parameter> parameters;
 }

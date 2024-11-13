@@ -2,25 +2,23 @@ package com.example.codoceanbmongo.discuss.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.UUID;
 
-@Entity
+@Document(collection = "images")
 @Setter
 @Getter
-@Table(name = "images")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class Image {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Column(name = "img_url")
     private String imageUrl;
 
-    @ManyToOne
-    @JoinColumn(name = "discuss_id")
+    @DBRef
     private Discuss discuss;
 }

@@ -8,8 +8,10 @@ import com.example.codoceanbmongo.notification.entity.Notification;
 import com.example.codoceanbmongo.payment.entity.Payment;
 import com.example.codoceanbmongo.submitcode.problem.entity.Problem;
 import com.example.codoceanbmongo.submitcode.submission.entity.Submission;
-import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,8 +22,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-@Entity
-@Table(name = "users")
+@Document(collection = "users")
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter
@@ -29,100 +30,65 @@ import java.util.UUID;
 @Builder
 public class User implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Column(name = "full_name")
     private String fullName;
-
-    @Column(name = "phone_number")
     private String phoneNumber;
-
-    @Column(name = "date_of_birth")
     private LocalDateTime dateOfBirth;
-
     private String email;
-
-    @Column(length = 1000, name = "url_img")
     private String urlImage;
-
     private String password;
-
-    @Column(name = "address")
     private String address;
-
-    @Column(name = "city")
     private String city;
-
-    @Column(name = "country")
     private String country;
-
-    @Column(name = "school")
     private String school;
-
-    @Column(name = "occupation")
     private String occupation;
-
-    @Column(name = "favorite_programming_language")
     private String favoriteProgrammingLanguage;
-
-    @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-    @Column(name = "vip_exp_date")
     private LocalDateTime VIPExpDate;
-
-    @Column(name = "is_active")
     private boolean isActive;
-
-    @Column(name = "is_first_login")
     private boolean isFirstLogin;
-
-    @Enumerated(EnumType.STRING)
     private ERole role;
-
-    @Column(name = "is_locked")
     private boolean isLocked;
 
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    @DBRef
     private List<Problem> ownedProblems;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @DBRef
     private List<ContestEnrollment> contestEnrollments;
 
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    @DBRef
     private List<Contest> contests;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @DBRef
     private Token token;
 
-    @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL)
+    @DBRef
     private List<Notification> notifications;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @DBRef
     private List<Comment> comments;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @DBRef
     private List<Submission> submissions;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @DBRef
     private List<OTP> otps;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @DBRef
     private List<Payment> payments;
 
-    @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
+    @DBRef
     private List<Emoji> emojis;
-    
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
-        authorityList.add(new SimpleGrantedAuthority("ROLE_"+role.name().toUpperCase()));
+        authorityList.add(new SimpleGrantedAuthority("ROLE_" + role.name().toUpperCase()));
         return authorityList;
     }
+
     @Override
     public String getUsername() {
         return fullName;
@@ -145,7 +111,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return isActive;
     }
 
     public enum ERole {
@@ -155,6 +121,7 @@ public class User implements UserDetails {
         MODERATOR(3);
 
         private final int value;
+
         ERole(int value) {
             this.value = value;
         }

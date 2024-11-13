@@ -3,9 +3,9 @@ package com.example.codoceanbmongo.discuss.repository;
 import com.example.codoceanbmongo.discuss.entity.Discuss;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.mongodb.repository.Aggregation;
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,30 +13,27 @@ import java.util.Map;
 import java.util.UUID;
 
 @Repository
-public interface DiscussRepository extends JpaRepository<Discuss, UUID> {
-    @Query(value = "SELECT d FROM Discuss d WHERE d.isClosed = FALSE AND d.owner.email = :email")
-    List<Discuss> findByOwnerEmail(String email);
-    @Query(value = "SELECT d.id, d.title, d.created_at, d.description, d.end_at, d.is_closed, d.user_id, d.updated_at, COUNT(c.id) AS comment_count, u.url_img AS user_url_img, u.full_name AS user_name, u.email AS user_email " +
-            "FROM discusses d " +
-            "LEFT JOIN comments c ON d.id = c.discuss_id " +
-            "LEFT JOIN discuss_categories dc ON d.id = dc.discuss_id " +
-            "LEFT JOIN categories cat ON dc.category_id = cat.id " +
-            "LEFT JOIN users u ON d.user_id = u.id " +
-            "WHERE d.is_closed IS FALSE " +
-            "AND (:searchTerm IS NULL OR d.title LIKE %:searchTerm%) " +
-            "AND (:category IS NULL OR cat.name = :category) " +
-            "GROUP BY d.id, d.title, d.created_at, d.description, d.end_at, d.is_closed, d.updated_at, u.id, u.url_img, u.full_name, u.email " +
-            "ORDER BY comment_count DESC",
-            nativeQuery = true)
-    Page<Discuss> findAllWithCommentCount(@Param("searchTerm") String searchTerm,
-                                          @Param("category") String category,
-                                          Pageable pageable);
+public interface DiscussRepository extends MongoRepository<Discuss, UUID> {
+    List<Discuss> findByIsClosedFalseAndOwnerEmail(String email);
 
-    @Query(value = "SELECT EXTRACT(MONTH FROM d.created_at) AS month, COUNT(d.id) AS total " +
-                   "FROM discusses d " +
-                   "WHERE EXTRACT(YEAR FROM d.created_at) = :year " +
-                   "GROUP BY EXTRACT(MONTH FROM d.created_at) " +
-                   "ORDER BY month",
-           nativeQuery = true)
-    List<Map<String, Object>> getMonthlyPostsCount(@Param("year") int year);
+    Page<Discuss> findByTitleContainsIgnoreCaseAndCategoriesName(String searchTerm, String category, Pageable pageable);
+
+    List<Discuss> findByCreatedAtYear(int year); // Requires custom aggregation for advanced date extraction
+
+    @Aggregation(pipeline = {
+            "{ $match: { title: { $regex: ?0, $options: 'i' }, 'categories.name': ?1 } }",
+            "{ $addFields: { comment_count: { $size: { $ifNull: ['$comments', []] } } } }",
+            "{ $sort: { comment_count: -1 } }",
+            "{ $skip: ?2 }",  // Skip for pagination
+            "{ $limit: ?3 }"  // Limit for pagination
+    })
+    Slice<Discuss> findAllWithCommentCount(String searchTerm, String category, int skip, int limit);
+
+    @Aggregation(pipeline = {
+            "{ $match: { 'createdAt': { $gte: ISODate(?0), $lt: ISODate(?1) } } }",
+            "{ $group: { _id: { $month: '$createdAt' }, total: { $count: {} } } }",
+            "{ $sort: { '_id': 1 } }",
+            "{ $project: { month: '$_id', total: 1, _id: 0 } }"
+    })
+    List<Map<String, Object>> getMonthlyPostsCount(String startOfYear, String endOfYear);
 }

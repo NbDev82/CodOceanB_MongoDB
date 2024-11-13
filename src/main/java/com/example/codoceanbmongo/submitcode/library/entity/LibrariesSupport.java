@@ -6,24 +6,23 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 import java.util.UUID;
 
-@Entity
-@Table(name = "library_support")
+@Document(collection = "library_support")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
 public class LibrariesSupport implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     private String name;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "problem_id")
+    @DBRef
     private Problem problem;
 }

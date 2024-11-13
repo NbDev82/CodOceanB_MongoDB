@@ -11,23 +11,16 @@ spring:
     devtools:
         livereload:
             enabled: true
-    datasource:
-        url: jdbc:postgresql://${PROD_DB_HOST}:${PROD_DB_PORT}/${PROD_DB_NAME}?currentSchema=${PROD_SCHEMA_NAME}
-        username: ${PROD_DB_USER}
-        password: ${PROD_DB_PASSWORD}
-        driverClassName: org.postgresql.Driver
-    sql:
-        init:
-            mode: always
-    jpa:
-        hibernate:
-            ddl-auto: update
-        show-sql: true
-        open-in-view: true
-        properties:
-            hibernate:
-                dialect: org.hibernate.dialect.PostgreSQLDialect
 
+    # MongoDB Configuration
+    data:
+        mongodb:
+            uri: mongodb://${PROD_DB_HOST}:${PROD_DB_PORT}/${PROD_DB_NAME}
+            database: ${PROD_DB_NAME}
+    autoconfigure:
+        exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+
+# Logging Configuration
 logging:
     file:
         name: mylog.log

@@ -1,30 +1,26 @@
 package com.example.codoceanbmongo.auth.entity;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
-import java.util.UUID;
 
-@Entity
-@Table(name = "tokens")
+@Document(collection = "tokens")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
 public class Token implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    private String id;
 
-
-    @Column(columnDefinition = "text")
     private String token;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id")
+    @DBRef
     private User user;
 }

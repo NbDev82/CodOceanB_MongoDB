@@ -6,22 +6,21 @@ import com.example.codoceanbmongo.auth.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.apache.logging.log4j.core.config.plugins.validation.constraints.Required;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Entity
-@Table(name = "reports")
+@Document(collection = "reports")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
 public class Report {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     private EReportType type;
@@ -30,17 +29,14 @@ public class Report {
     private EStatus status;
     private String reason;
 
-    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Required
     private UUID violationId;
 
-    @OneToMany
+    @DBRef
     private List<ViolationType> violationTypes;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "owner_id")
+    @DBRef
     private User owner;
 
     @Getter

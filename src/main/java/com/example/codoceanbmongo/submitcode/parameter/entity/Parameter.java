@@ -6,32 +6,29 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 import java.util.UUID;
 
-@Entity
-@Table(name = "parameters")
+@Document(collection = "parameters")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
 public class Parameter implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     private int index;
 
     private String name;
 
-    @Column(name = "input_datatype")
     private String inputDataType;
 
-    @Column(name = "input_data")
     private String inputData;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "test_case_id")
+    @DBRef
     private TestCase testCase;
 }

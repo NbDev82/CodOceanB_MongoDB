@@ -1,36 +1,32 @@
 package com.example.codoceanbmongo.auth.entity;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Entity
-@Table(name = "Otps")
+@Document(collection = "otps")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
 public class OTP {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    private String id;
 
-    @Column(name="encrypted_otp")
     private String encryptedOTP;
-
-    @Column(name="expiration")
     private LocalDateTime expirationDate;
-
     private EType type;
 
-    @JoinColumn(name = "user_id")
-    @ManyToOne
+    @DBRef
     private User user;
+
     public enum EType {
         FORGOT_PASSWORD,
         ACTIVE_ACCOUNT,

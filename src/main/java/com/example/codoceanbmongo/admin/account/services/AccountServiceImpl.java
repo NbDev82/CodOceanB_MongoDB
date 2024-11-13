@@ -54,7 +54,7 @@ public class AccountServiceImpl implements AccountService{
     @Override
     public List<ProfileDTO> getProfiles() {
         try {
-            List<User> users = userRepos.findUsers();
+            List<User> users = userRepos.findUsersByRoleNot(User.ERole.ADMIN.toString());
             return profileMapper.toDTOs(users);
         } catch (Exception e) {
             log.info(e.getMessage());
